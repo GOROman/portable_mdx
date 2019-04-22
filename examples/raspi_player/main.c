@@ -211,6 +211,7 @@ main(
 
 	/* MXDRV の初期化 */
 	#define SAMPLES_PER_SEC 48000
+	printf("Sampling Rate:%dHz\n", SAMPLES_PER_SEC );
 	{
 		int ret = MXDRV_Start(
 			&context,
@@ -253,11 +254,11 @@ main(
 	);
 
 	/* SDL 初期化 */
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		printf("SDL_Init(SDL_INIT_EVERYTHING) failed: %s", SDL_GetError());
+	if (SDL_Init(SDL_INIT_AUDIO|SDL_INIT_EVENTS) != 0) {
+		printf("SDL_Init() failed: %s", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
-
+#if 0
 	/* メインウィンドウ作成 */
 	#define WINDOW_WIDTH	512
 	#define WINDOW_HEIGHT	512
@@ -272,7 +273,7 @@ main(
 		exit(EXIT_FAILURE);
 	}
 	SDL_Surface *surface = SDL_GetWindowSurface(window);
-
+#endif
 	/* SDL AUDIO 初期化 */
 	{
 		SDL_AudioSpec fmt;
@@ -280,7 +281,7 @@ main(
 		fmt.freq		= SAMPLES_PER_SEC;
 		fmt.format		= AUDIO_S16SYS;
 		fmt.channels	= 2;
-		fmt.samples		= 512;
+		fmt.samples		= 512*10;// modified
 		fmt.callback	= sdlAudioCallback;
 		fmt.userdata	= &context;
 		if (SDL_OpenAudio(&fmt, NULL) < 0) {
@@ -306,7 +307,7 @@ main(
 				} break;
 			}
 		}
-
+#if 0
 		/* 画面消去 */
 		SDL_FillRect(surface, NULL, 0);
 
@@ -443,14 +444,14 @@ main(
 				keyOnLevelMeters[i] = keyOnLevelMeters[i] * 31 / 32;
 			}
 		}
-
+#endif
 		/* 画面更新 */
-		SDL_UpdateWindowSurface(window);
+		//		SDL_UpdateWindowSurface(window);
 		SDL_Delay(10);
 	}
 
 	/* 終了処理 */
-	SDL_DestroyWindow(window);
+	//	SDL_DestroyWindow(window);
 	SDL_Quit();
 	MXDRV_End(&context);
 	MxdrvContext_Terminate(&context);
