@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <iconv.h>
 
 #include <mdx_util.h>
 #include <mxdrv.h>
@@ -86,7 +87,8 @@ main(
 	}
 
 	/* MDX タイトルの取得 */
-	char mdxTitle[256];
+	char mdxTitle[256], mdxTitleUTF8[256];
+
 	if (
 		MdxGetTitle(
 			mdxFileImage, mdxFileImageSizeInBytes,
@@ -96,8 +98,19 @@ main(
 		printf("MdxGetTitle failed.\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("mdx title = %s\n", mdxTitle);
 
+	{
+	  iconv_t icd;
+	  icd = iconv_open("UTF-8", "Shift_JIS");
+	  size_t inbytes = strlen(mdxTitle);
+	  size_t outbytes = sizeof(mdxTitleUTF8)-1;
+	  char* ptr_in = mdxTitle;
+	  char* ptr_out = mdxTitleUTF8;
+	  memset(mdxTitleUTF8,0x00, sizeof(mdxTitleUTF8)); 
+	  iconv(icd, &ptr_in, &inbytes, &ptr_out, &outbytes);
+	  printf("mdx title = %s\n", mdxTitleUTF8);
+	  iconv_close(icd);
+	}
 	/* PDX ファイルを要求するか */
 	bool hasPdx;
 	if (
