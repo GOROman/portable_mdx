@@ -9,7 +9,7 @@ STRIP = strip
 SDL2CONF = sdl2-config
 
 TARGET_DIR = objs
-TARGET = simple_player
+TARGET = raspi_player
 
 ifeq ($(OS),Windows_NT)
 EXE_PREFIX = .exe
